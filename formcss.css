@@ -1,0 +1,27 @@
+h2
+{
+    color: darkgreen;
+}
+#graph
+{
+    float: right;
+    padding-right: 5%;
+    padding-bottom: 5%;
+}
+#menutd1
+{
+    padding: 10px;
+}
+#menutd2
+{
+    padding: 10px;
+}
+#menutd3
+{
+    padding: 10px;
+}
+#tr1
+{
+    border: 10px solid;
+    border-color: darkgreen;
+}

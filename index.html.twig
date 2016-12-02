@@ -1,0 +1,36 @@
+<style>
+table
+{
+    font-family: arial, sans-serif;
+    border-collapse: collapse;
+    width: 40%;
+}
+td, th {
+    border: 1px solid #dddddd;
+    text-align: left;
+    padding: 8px;
+}
+tr,td:nth-child(even) {
+    background-color: orange;
+}
+</style>
+<table>
+    <tr>
+        <th>Lokale</th>
+        <th>Dato</th>
+        <th>Tid</th>
+        <th>Lyd Decibel</th>
+        <th>Lys Lumen</th>
+        <th>Temp Celsius</th>
+    </tr>
+    {% for result in results %}
+    <tr>
+        <td>{{ result.LokaleId }}</td>
+        <td>{{ result.Tid|date('d-m-Y') }}</td>
+        <td>{{ result.Tid|date('H:i') }}</td>
+        <td>{{ result.Lyd }}</td>
+        <td>{{ result.Lys }}</td>
+        <td>{{ result.Temp }}</td>
+    </tr>
+    {% endfor %}
+</table>

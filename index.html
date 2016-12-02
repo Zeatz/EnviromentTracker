@@ -25,7 +25,6 @@
             $( "#datepicker" ).datepicker();
         } );
     </script>
-
   </head>
 <body>
 <h2>Enviroment Tracker</h2>
@@ -190,6 +189,11 @@
     </tr>
 </table>
 <table id="Menu">
+<tr>
+    <td>
+        <h2>Menu</h2>
+    </td>
+</tr>
     <tr>
         <td id="menutd1">
             <button id="SeMereData">Se mere data</button>
@@ -218,7 +222,13 @@
         {x: '2016-10-01 13:20:00', y: 30, group: 0},
         {x: '2016-10-01 13:30:00', y: 22, group: 0},
         {x: '2016-10-01 13:40:00', y: 20, group: 0},
-        {x: '2016-10-01 13:50:00', y: 21, group: 0}
+        {x: '2016-10-01 13:50:00', y: 21, group: 0},
+        {x: '2016-10-01 14:00:00', y: 22, group: 1},
+        {x: '2016-10-01 14:10:00', y: 25, group: 1},
+        {x: '2016-10-01 14:20:00', y: 30, group: 1},
+        {x: '2016-10-01 14:30:00', y: 22, group: 1},
+        {x: '2016-10-01 14:40:00', y: 20, group: 1},
+        {x: '2016-10-01 14:50:00', y: 21, group: 1}
     ];
 
     var dataset = new vis.DataSet(items);

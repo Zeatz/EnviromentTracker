@@ -20,29 +20,41 @@ h2
 {
     padding: 10px;
 }
-#tr1
-{
-    border: 10px solid;
-    border-color: darkgreen;
-}
+
 #Menu{
-    border: 3px solid hotpink;
-    padding-left: 5%;
+    border: 3px solid black;
+    padding-left: 100px;
+    margin-left: 50px;
     padding-right: 5%;
     padding-top: 0%;
     padding-bottom: 5%;
     align-items:center;
 
 }
-h2{
-    padding-left: 37px;
+#menumenu{
+    padding-left:80px;
+    color: black;
+
 }
 #menutd1{
-padding-left: 25px;
+padding-left: 70px;
 }
 #menutd2{
-    padding-left: 32px;
+    padding-left: 77px;
 }
 #menutd3{
-    padding-left: 5px;
+    padding-left: 47px;
 }
+#apidiv{
+    padding-top:5%;
+    margin-right: 10px;;
+}
+.wrapper{
+    text-align: center;
+}
+#forsidenavn{
+    margin-left: 1%;
+    color: hotpink;
+}
+
+

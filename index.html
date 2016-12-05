@@ -12,27 +12,48 @@
     <link href="Assets/JsLibary/vis-timeline-graph2d.min.css"  rel="stylesheet" type="text/css"/>
     <link href="formcss.css" rel="stylesheet" type="text/css"/>
 
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
+          integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <!-- Optional theme -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css"
+          integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
+
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>jQuery UI Datepicker - Display month &amp; year menus</title>
     <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+    <script src="http://code.jquery.com/jquery-1.9.1.js"></script>
     <link rel="stylesheet" href="/resources/demos/style.css">
     <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
     <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
-    <script>
-        $( function() {
-            $.datepicker.setDefaults({ dateFormat: 'yy-mm-dd' });
-            $( "#datepicker" ).datepicker();
-        } );
-    </script>
   </head>
 <body>
-<h2>Enviroment Tracker</h2>
+<h2 id="forsidenavn">Enviroment Tracker</h2>
 <div style="width:800px; font-size:14px; text-align: justify;">
 </div>
 <br/>
-
-
+<div class="container col-sm-4">
+    <div class="panel panel-success">
+        <div class="panel-heading">Menu</div>
+        <div class="panel-body">
+            <div class="wrapper">
+            <div id="buttonholder" class="btn-group-vertical" role="group" aria-label="Vertical button group">
+                <button type="button" class="btn btn-success">Se mere data</button>
+                <button type="button" class="btn btn-success">Sammenlign data</button>
+                <button type="button" class="btn btn-success">Se lokaler</button>
+            </div>
+            <div id="apidiv">Vejret i:
+                <input type="text" id="awxSearchTextBox" placeholder="Bynavn" />
+                <input id="awxSearchButton" class="btn btn-success" type="submit" value="Søg" >
+                    <h3 id="h3overskrift">Vejret lige nu:</h3>
+                    <span id="awxWeatherInfo"></span>
+                    <span id="awxLocationInfo"></span>
+            </div>
+            </div>
+        </div>
+    </div>
+</div>
 <table id="graph">
     <col width="600">
     <col width="220">
@@ -188,32 +209,151 @@
         </td>
     </tr>
 </table>
-<table id="Menu">
-<tr>
-    <td>
-        <h2>Menu</h2>
-    </td>
-</tr>
-    <tr>
-        <td id="menutd1">
-            <button id="SeMereData">Se mere data</button>
-        </td>
-    </tr>
-    <tr>
-        <td id="menutd2">
-            <button id="SeLokaler">Se Lokaler</button>
-        </td>
-    </tr>
-    <tr>
-        <td id="menutd3">
-            <button id="SamemenlignLokaler">Samemenlign Lokaler</button>
-        </td>
-    </tr>
-</table>
-
-
-
 <script type="text/javascript">
+
+    $(function () {
+
+        var isMetric = true;
+        var locationUrl = "";
+        var currentConditionsUrl = "";
+        var currentLocationKey = "";
+
+        var language = "da";
+
+        var apiKey = "apcphlMLHmJA1OOZ7ctz7OORIEe6WwVo";
+
+        var awxClearMessages = function() {
+            $("#awxLocationInfo").html("...");
+            $("#awxLocationUrl").html("...");
+            $("#awxWeatherInfo").html("...");
+            $("#awxWeatherUrl").html("...");
+        }
+
+        var awxCityLookUp = function (freeText) {
+            awxClearMessages();
+            locationUrl = "http://dataservice.accuweather.com/locations/v1/search?apikey=" + apiKey + "&q=" + freeText;
+            currentLocationKey = freeText;
+            $.ajax({
+                type: "GET",
+                url: locationUrl,
+                dataType: "jsonp",
+                cache: true,                    // Use cache for better reponse times
+                jsonpCallback: "awxCallback",   // Prevent unique callback name for better reponse times
+                success: function (data) { awxCityLookUpFound(data); }
+            });
+        };
+
+        var awxCityLookUpFound = function (data) {
+            var msg, locationKey = null;
+
+            $("#awxLocationUrl").html("<a href=" + encodeURI(locationUrl) + ">" + locationUrl + "</a>");
+            if (data.length == 1) {
+                locationKey = data[0].Key;
+                msg ="<b>" + data[0].LocalizedName + "</b>";
+            }
+            else if(data.length == 0) {
+                msg = "No locations found."
+            }
+            else {
+                locationKey = data[0].Key;
+                msg = data[0].LocalizedName + "  " + data[0].Country.ID;
+            }
+
+            $("#awxLocationInfo").html(msg);
+            if(locationKey != null) {
+                awxGetCurrentConditions(locationKey);
+            }
+
+        };
+
+        var awxGetCurrentConditions = function (locationKey) {
+            currentConditionsUrl = "http://dataservice.accuweather.com/currentconditions/v1/" + locationKey + "?apikey=" + apiKey + "&language=" + language;
+            $.ajax({
+                type: "GET",
+                url: currentConditionsUrl,
+                dataType: "jsonp",
+                cache: true,                    // Use cache for better reponse times
+                jsonpCallback: "awxCallback",   // Prevent unique callback name for better reponse times
+                success: function (data) {
+                    var html;
+                    if(data && data.length > 0) {
+                        var conditions = data[0];
+                        var temp = isMetric ? conditions.Temperature.Metric : conditions.Temperature.Imperial;
+                        html = conditions.WeatherText + "   " + temp.Value + " " + temp.Unit +", ";
+                    }
+                    else {
+                        html = "N/A";
+                    }
+                    $("#awxWeatherInfo").html(html);
+                    $("#awxWeatherUrl").html("<a href=" + currentConditionsUrl + ">" + currentConditionsUrl + "</a>");
+                }
+            });
+        };
+
+        $("#awxSearchTextBox").keypress(function (e) {
+            if ((e.which && e.which == 13) || (e.keyCode && e.keyCode == 13)) {
+                var text = $("#awxSearchTextBox").val();
+                awxCityLookUp(text);
+                return false;
+            } else {
+                return true;
+            }
+        });
+
+        $("#awxSearchButton").click(function () {
+            var text = $("#awxSearchTextBox").val();
+            awxCityLookUp(text);
+        });
+        window.onload = function DoOnLoad() {
+            awxCityLookUp("Roskilde");
+        }
+        window.setInterval(awxCityLookUp(currentLocationKey), 100000);
+
+    });
+
+</script>
+<script type="text/javascript">
+
+    $( function() {
+        $.datepicker.setDefaults({ dateFormat: 'yy-mm-dd' });
+        $( "#datepicker" ).datepicker({
+            onSelect: function (dateText, inst) {
+                var date = $(this).val();
+                var selectDateUrl = "http://eviromentwebservice.azurewebsites.net/api/date/" + date;
+                $.ajax({
+                    async: true,
+                    type: "GET",
+                    crossDomain: true,
+                    url: selectDateUrl,
+                    dataType: "jsonp",
+                    cache: true,                    // Use cache for better reponse times
+                    jsonpCallback: "awxCallback",   // Prevent unique callback name for better reponse times
+                    success: function (data) {
+
+                        if(data && data.length > 0) {
+                            var items = [];
+                            for (i = 0; i < data.length; ++i){
+                                var d = data[i];
+                                if (d.LokaleId == 201){
+                                    var dato = new Date(Date.parse(d.Tid));
+                                    var temp = d.Temp;
+                                    items[i] = {x: dato, y: temp, group: 0};
+                                    // TODO: MAKE IT FUCKING WORK
+
+                                    console.log(items[i]);
+                                }
+                            }
+                            var gdata = new vis.DataSet(items);
+                        }
+                        else {
+                        window.alert("Ingen data fundet");
+                        }
+                    }
+                });
+
+            }
+        });
+    })
 
     var container = document.getElementById('visualization');
     var items = [
@@ -291,5 +431,8 @@
         graph2d.setGroups(groups);
     }
 </script>
+<!-- Latest compiled and minified JavaScript -->
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"
+        integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
 </body>
 </html>

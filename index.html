@@ -22,9 +22,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>jQuery UI Datepicker - Display month &amp; year menus</title>
-    <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
-    <script src="http://code.jquery.com/jquery-1.9.1.js"></script>
-    <link rel="stylesheet" href="/resources/demos/style.css">
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
     <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
     <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
   </head>
@@ -39,7 +37,7 @@
         <div class="panel-body">
             <div class="wrapper">
             <div id="buttonholder" class="btn-group-vertical" role="group" aria-label="Vertical button group">
-                <button type="button" class="btn btn-success">Se mere data</button>
+                <button type="button" onclick="SeeMoreData()" class="btn btn-success">Se mere data</button>
                 <button type="button" class="btn btn-success">Sammenlign data</button>
                 <button type="button" class="btn btn-success">Se lokaler</button>
             </div>
@@ -204,12 +202,19 @@
                     </select>
                 </td>
                 </tr>
-                <p>Dato: <input type="text" id="datepicker"></p>
+                <p>Dato: <input type="text" onchange="GetDateObjects()" id="datepicker"></p>
             </table>
         </td>
     </tr>
 </table>
 <script type="text/javascript">
+
+    function SeeMoreData() {
+        var dato = document.getElementById("datepicker").value;
+        var url = 'php/databasecode.php?date=' + dato;
+        window.location=url;
+    }
+
 
     $(function () {
 
@@ -224,9 +229,7 @@
 
         var awxClearMessages = function() {
             $("#awxLocationInfo").html("...");
-            $("#awxLocationUrl").html("...");
             $("#awxWeatherInfo").html("...");
-            $("#awxWeatherUrl").html("...");
         }
 
         var awxCityLookUp = function (freeText) {
@@ -246,7 +249,6 @@
         var awxCityLookUpFound = function (data) {
             var msg, locationKey = null;
 
-            $("#awxLocationUrl").html("<a href=" + encodeURI(locationUrl) + ">" + locationUrl + "</a>");
             if (data.length == 1) {
                 locationKey = data[0].Key;
                 msg ="<b>" + data[0].LocalizedName + "</b>";
@@ -285,7 +287,6 @@
                         html = "N/A";
                     }
                     $("#awxWeatherInfo").html(html);
-                    $("#awxWeatherUrl").html("<a href=" + currentConditionsUrl + ">" + currentConditionsUrl + "</a>");
                 }
             });
         };
@@ -307,7 +308,6 @@
         window.onload = function DoOnLoad() {
             awxCityLookUp("Roskilde");
         }
-        window.setInterval(awxCityLookUp(currentLocationKey), 100000);
 
     });
 
@@ -316,70 +316,25 @@
 
     $( function() {
         $.datepicker.setDefaults({ dateFormat: 'yy-mm-dd' });
-        $( "#datepicker" ).datepicker({
-            onSelect: function (dateText, inst) {
-                var date = $(this).val();
-                var selectDateUrl = "http://eviromentwebservice.azurewebsites.net/api/date/" + date;
-                $.ajax({
-                    async: true,
-                    type: "GET",
-                    crossDomain: true,
-                    url: selectDateUrl,
-                    dataType: "jsonp",
-                    cache: true,                    // Use cache for better reponse times
-                    jsonpCallback: "awxCallback",   // Prevent unique callback name for better reponse times
-                    success: function (data) {
-
-                        if(data && data.length > 0) {
-                            var items = [];
-                            for (i = 0; i < data.length; ++i){
-                                var d = data[i];
-                                if (d.LokaleId == 201){
-                                    var dato = new Date(Date.parse(d.Tid));
-                                    var temp = d.Temp;
-                                    items[i] = {x: dato, y: temp, group: 0};
-                                    // TODO: MAKE IT FUCKING WORK
-
-                                    console.log(items[i]);
-                                }
-                            }
-                            var gdata = new vis.DataSet(items);
-                        }
-                        else {
-                        window.alert("Ingen data fundet");
-                        }
-                    }
-                });
-
-            }
-        });
+        $( "#datepicker" ).datepicker();
     })
 
     var container = document.getElementById('visualization');
-    var items = [
-        {x: '2016-10-01 13:00:00', y: 22, group: 0},
-        {x: '2016-10-01 13:10:00', y: 25, group: 0},
-        {x: '2016-10-01 13:20:00', y: 30, group: 0},
-        {x: '2016-10-01 13:30:00', y: 22, group: 0},
-        {x: '2016-10-01 13:40:00', y: 20, group: 0},
-        {x: '2016-10-01 13:50:00', y: 21, group: 0},
-        {x: '2016-10-01 14:00:00', y: 22, group: 1},
-        {x: '2016-10-01 14:10:00', y: 25, group: 1},
-        {x: '2016-10-01 14:20:00', y: 30, group: 1},
-        {x: '2016-10-01 14:30:00', y: 22, group: 1},
-        {x: '2016-10-01 14:40:00', y: 20, group: 1},
-        {x: '2016-10-01 14:50:00', y: 21, group: 1}
-    ];
-
-    var dataset = new vis.DataSet(items);
     var options = {
-        start: '2016-10-01 12:00:00',
-        end: '2016-10-01 15:00:00',
+        start: '2016-12-01 12:00:00',
+        end: '2016-12-01 15:00:00',
         dataAxis: {
             showMinorLabels: false,
             icons: true
         }
     };
+    function parseDate(input) {
+        var d = Date.parse(input);
+        var dated = new Date(d);
+        var datestr = dated.getFullYear()+ '-' + (dated.getMonth()+1)+ '-' + dated.getDate()+ ' ' + dated.getHours()+ ':' + dated.getMinutes() + ':' + dated.getSeconds();
+
+        return datestr;
+    }
 
     var groupData = {
         id: 0,
@@ -394,6 +349,61 @@
         }
     };
 
+    function SetOptions(date) {
+        options = {
+            start: date + ' 00:00:00',
+            end: date  + ' 23:59:59',
+            dataAxis: {
+                showMinorLabels: false,
+                icons: true
+            }
+        };
+        graph2d.setOptions(options);
+    }
+
+
+    function GetDateCallback(items) {
+        dataset.clear();
+        dataset.add(items);
+    }
+    function GetDateObjects() {
+        var dato = document.getElementById("datepicker").value;
+        SetOptions(dato);
+        var items = [];
+        //var DateUrl = "http://eviromentwebservice.azurewebsites.net/api/date/" + dato;
+        var DateUrl = "php/dategetter.php?date=" + dato;
+        console.log(DateUrl);
+        $.ajax({
+            type: 'GET',
+            url: DateUrl,
+            dataType: 'json',
+            success: function (data) {
+                console.log(data);
+                var parsedJson = JSON.parse(data);
+                for (var key in parsedJson){
+                    if (parsedJson.hasOwnProperty(key)){
+                        if (parsedJson[key].LokaleId == 201) {
+                            var dato = parseDate(parsedJson[key].Tid);
+                            var temp = parseInt(parsedJson[key].Temp);
+                            items.push({x: dato, y: temp, group: 0});
+                        }
+                        //if (parsedJson[key].LokaleId == 203){
+                         //   var dato = parseDate(parsedJson[key].Tid);
+                         //   var temp = parseInt(parsedJson[key].Temp);
+                         //   items.push({x: dato, y: temp, group: 1});
+                       // }
+                    }
+                }
+                GetDateCallback(items);
+            },
+            error: function (res) { console.log("error success wasnt reached, printing response:");
+            console.log(res);
+            }
+        });
+    }
+
+    var dataset = new vis.DataSet();
+
     var groups = new vis.DataSet();
     groups.add(groupData);
 
@@ -401,6 +411,7 @@
     updateStyle();
 
     function updateStyle() {
+
         groupData.style = "";
         groupData.style += document.getElementById("color").value;
         groupData.style += document.getElementById("line").value;
@@ -430,6 +441,7 @@
         groups.add(groupData);
         graph2d.setGroups(groups);
     }
+
 </script>
 <!-- Latest compiled and minified JavaScript -->
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"

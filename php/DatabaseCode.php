@@ -1,5 +1,6 @@
 <?php
-$uri ="http://eviromentwebservice.azurewebsites.net/api/date/2016-11-30";
+$getParameter = $_GET["date"];
+$uri ="http://eviromentwebservice.azurewebsites.net/api/date/" . $getParameter;
 $jsondata = file_get_contents($uri);
 
 $convertToAssociativeArray = true;

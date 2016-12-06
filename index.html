@@ -37,13 +37,13 @@
         <div class="panel-body">
             <div class="wrapper">
             <div id="buttonholder" class="btn-group-vertical" role="group" aria-label="Vertical button group">
-                <button type="button" onclick="SeeMoreData()" class="btn btn-success">Se mere data</button>
+                <button type="button" onclick="SeeMoreData()" class="btn btn-primary">Se mere data</button>
                 <button type="button" onclick="SamData()" class="btn btn-success">Sammenlign data</button>
-                <button type="button" class="btn btn-success">Se lokaler</button>
+                <button type="button" onclick="SeLokaler()" class="btn btn-danger">Se lokaler</button>
             </div>
             <div id="apidiv">Vejret i:
                 <input type="text" id="awxSearchTextBox" placeholder="Bynavn" />
-                <input id="awxSearchButton" class="btn btn-success" type="submit" value="Søg" >
+                <input id="awxSearchButton" class="btn btn-info" type="submit" value="Søg" >
                     <h3 id="h3overskrift">Vejret lige nu:</h3>
                     <span id="awxWeatherInfo"></span>
                     <span id="awxLocationInfo"></span>
@@ -214,6 +214,12 @@
 <script type="text/javascript"  >
 
 
+
+    function SeLokaler() {
+        var url = 'php/SeLokaler.php';
+        window.location=url;
+    }
+
     function SamData() {
         var url = 'php/SammenlignData.php?';
         window.location=url;
@@ -371,7 +377,7 @@
         }
     };
     function SetOptions(date) {
-        var barStyle = document.getElementById('CheckboxBar').checked == true;
+        var barStyle = document.getElementById('CheckboxBar').checked;
         if (barStyle){
             options = {
                 style: "bar",
@@ -403,8 +409,8 @@
     }
     function GetDateObjects() {
         var dato = document.getElementById("datepicker").value;
-        var cb201 = document.getElementById("Checkbox201").checked == false;
-        var cb203 = document.getElementById("Checkbox203").checked == false;
+        var cb201 = document.getElementById("Checkbox201").checked;
+        var cb203 = document.getElementById("Checkbox203").checked;
         SetOptions(dato);
         var items = [];
         //var DateUrl = "http://eviromentwebservice.azurewebsites.net/api/date/" + dato;

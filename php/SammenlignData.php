@@ -1,5 +1,5 @@
 
-gennemsnittet er 42
+gennemsnittet er..
 
 
 <?php

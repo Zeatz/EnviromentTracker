@@ -371,7 +371,7 @@
         }
     };
     function SetOptions(date) {
-        var barStyle = document.getElementById('CheckboxBar').checked;
+        var barStyle = document.getElementById('CheckboxBar').checked == true;
         if (barStyle){
             options = {
                 style: "bar",
@@ -403,8 +403,8 @@
     }
     function GetDateObjects() {
         var dato = document.getElementById("datepicker").value;
-        var cb201 = document.getElementById("Checkbox201").checked;
-        var cb203 = document.getElementById("Checkbox203").checked;
+        var cb201 = document.getElementById("Checkbox201").checked == false;
+        var cb203 = document.getElementById("Checkbox203").checked == false;
         SetOptions(dato);
         var items = [];
         //var DateUrl = "http://eviromentwebservice.azurewebsites.net/api/date/" + dato;

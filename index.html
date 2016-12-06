@@ -38,7 +38,7 @@
             <div class="wrapper">
             <div id="buttonholder" class="btn-group-vertical" role="group" aria-label="Vertical button group">
                 <button type="button" onclick="SeeMoreData()" class="btn btn-success">Se mere data</button>
-                <button type="button" class="btn btn-success">Sammenlign data</button>
+                <button type="button" onclick="SamData()" class="btn btn-success">Sammenlign data</button>
                 <button type="button" class="btn btn-success">Se lokaler</button>
             </div>
             <div id="apidiv">Vejret i:
@@ -126,12 +126,13 @@
                     <td>Fill Opacity</td>
                     <td>
                         <select id="fillopacity" onchange="updateStyle()">
+                            <option value="fill-opacity:0.0;" selected="selected">0.0</option>
                             <option value="fill-opacity:0.1;">0.1</option>
                             <option value="fill-opacity:0.2;">0.2</option>
                             <option value="fill-opacity:0.3;">0.3</option>
                             <option value="fill-opacity:0.4;">0.4</option>
                             <option value="fill-opacity:0.5;">0.5</option>
-                            <option value="fill-opacity:0.6;" selected="selected">0.6</option>
+                            <option value="fill-opacity:0.6;">0.6</option>
                             <option value="fill-opacity:0.7;">0.7</option>
                             <option value="fill-opacity:0.8;">0.8</option>
                             <option value="fill-opacity:0.9;">0.9</option>
@@ -203,11 +204,20 @@
                 </td>
                 </tr>
                 <p>Dato: <input type="text" onchange="GetDateObjects()" id="datepicker"></p>
+                <input id="Checkbox201" value="true" type="checkbox" data-reverse><p>201</p>
+                <input id="Checkbox203" value="true" type="checkbox" data-reverse><p>203</p>
+                <input id="CheckboxBar" value="true" type="checkbox" data-reverse><p>Bar</p>
             </table>
         </td>
     </tr>
 </table>
-<script type="text/javascript">
+<script type="text/javascript"  >
+
+
+    function SamData() {
+        var url = 'php/SammenlignData.php?';
+        window.location=url;
+    }
 
     function SeeMoreData() {
         var dato = document.getElementById("datepicker").value;
@@ -348,16 +358,41 @@
             }
         }
     };
-
-    function SetOptions(date) {
-        options = {
-            start: date + ' 00:00:00',
-            end: date  + ' 23:59:59',
-            dataAxis: {
-                showMinorLabels: false,
-                icons: true
+    var groupData2 = {
+        id: 1,
+        content: "Group Name",
+        options: {
+            drawPoints: {
+                style: 'circle' // square, circle
+            },
+            shaded: {
+                orientation: 'zero' // top, bottom
             }
-        };
+        }
+    };
+    function SetOptions(date) {
+        var barStyle = document.getElementById('CheckboxBar').checked;
+        if (barStyle){
+            options = {
+                style: "bar",
+                start: date + ' 00:00:00',
+                end: date  + ' 23:59:59',
+                dataAxis: {
+                    showMinorLabels: false,
+                    icons: true
+                }
+            };
+        }
+        else {
+            options = {
+                start: date + ' 00:00:00',
+                end: date  + ' 23:59:59',
+                dataAxis: {
+                    showMinorLabels: false,
+                    icons: true
+                }
+            };
+        }
         graph2d.setOptions(options);
     }
 
@@ -368,6 +403,8 @@
     }
     function GetDateObjects() {
         var dato = document.getElementById("datepicker").value;
+        var cb201 = document.getElementById("Checkbox201").checked;
+        var cb203 = document.getElementById("Checkbox203").checked;
         SetOptions(dato);
         var items = [];
         //var DateUrl = "http://eviromentwebservice.azurewebsites.net/api/date/" + dato;
@@ -382,16 +419,16 @@
                 var parsedJson = JSON.parse(data);
                 for (var key in parsedJson){
                     if (parsedJson.hasOwnProperty(key)){
-                        if (parsedJson[key].LokaleId == 201) {
+                        if (parsedJson[key].LokaleId == 201 && cb201)  {
                             var dato = parseDate(parsedJson[key].Tid);
                             var temp = parseInt(parsedJson[key].Temp);
                             items.push({x: dato, y: temp, group: 0});
                         }
-                        //if (parsedJson[key].LokaleId == 203){
-                         //   var dato = parseDate(parsedJson[key].Tid);
-                         //   var temp = parseInt(parsedJson[key].Temp);
-                         //   items.push({x: dato, y: temp, group: 1});
-                       // }
+                        if (parsedJson[key].LokaleId == 203 && cb203){
+                            var dato = parseDate(parsedJson[key].Tid);
+                            var temp = parseInt(parsedJson[key].Temp);
+                            items.push({x: dato, y: temp, group: 1});
+                       }
                     }
                 }
                 GetDateCallback(items);
@@ -406,7 +443,7 @@
 
     var groups = new vis.DataSet();
     groups.add(groupData);
-
+    groups.add(groupData2);
     var graph2d = new vis.Graph2d(container, dataset, groups, options);
     updateStyle();
 

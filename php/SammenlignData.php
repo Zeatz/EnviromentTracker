@@ -1,5 +1,5 @@
 
-men det virker
+gennemsnittet er 42
 
 
 <?php

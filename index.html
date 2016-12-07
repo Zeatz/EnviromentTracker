@@ -21,7 +21,6 @@
 
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>jQuery UI Datepicker - Display month &amp; year menus</title>
     <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
     <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
     <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
@@ -204,9 +203,9 @@
                 </td>
                 </tr>
                 <p>Dato: <input type="text" onchange="GetDateObjects()" id="datepicker"></p>
-                <input id="Checkbox201" value="true" type="checkbox" data-reverse><p>201</p>
-                <input id="Checkbox203" value="true" type="checkbox" data-reverse><p>203</p>
-                <input id="CheckboxBar" value="true" type="checkbox" data-reverse><p>Bar</p>
+                <input id="Checkbox201" value="true" type="checkbox" onchange="GetDateObjects()" data-reverse><span> Vis 201</span></br>
+                <input id="Checkbox203" value="true" type="checkbox" onchange="GetDateObjects()" data-reverse><span> Vis 203</span></br>
+                <input id="CheckboxBar" value="true" type="checkbox" onchange="GetDateObjects()" data-reverse><span> Vis histogram</span></br>
             </table>
         </td>
     </tr>
